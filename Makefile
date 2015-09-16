@@ -1,9 +1,10 @@
 # (C)2004-2008 SourceMod Development Team
 # Makefile written by David "BAILOPAN" Anderson
 
-SMSDK = ../..
+SMSDK = ../sourcemod
 SRCDS_BASE = ~/srcds
-MMSOURCE17 = ../../../mmsource-central
+MMSOURCE17 = ../metamod-source
+SOURCEPAWN = $(SMSDK)/sourcepawn/include
 
 #####################################
 ### EDIT BELOW FOR OTHER PROJECTS ###
@@ -31,26 +32,27 @@ C_OPT_FLAGS = -DNDEBUG -O3 -funroll-loops -pipe -fno-strict-aliasing
 C_DEBUG_FLAGS = -D_DEBUG -DDEBUG -g -ggdb3
 C_GCC4_FLAGS = -fvisibility=hidden
 CPP_GCC4_FLAGS = -fvisibility-inlines-hidden
-CPP = gcc
+CPP = g++ -std=c++11
 
 
 METAMOD = $(MMSOURCE17)/core-legacy
 
-INCLUDE += -I. -I.. -Isdk -I../ \
+INCLUDE += -I. -I./sdk \
 	-I$(METAMOD)/sourcehook -I$(SMSDK)/public -I$(SMSDK)/public/extensions \
-	-I$(SMSDK)/public/sourcepawn \
-	-I/opt/Source/lib/openssl/include \
+	-I$(SOURCEPAWN)
 
 CFLAGS += -DSE_EPISODEONE=1 -DSE_DARKMESSIAH=2 -DSE_ORANGEBOX=3 -DSE_ORANGEBOXVALVE=4 -DSE_LEFT4DEAD=5 -DSE_LEFT4DEAD2=6
 
 CFLAGS += -DCURL_STATIC_LIB
 
-LINK += -L./lib -lcurl -lrt -lssh2 -lssl -lcrypto -lz
+LINK += -lcurl -lrt -lssh2 -lssl -lcrypto -lz
 
 LINK += -m32 -ldl -lm
 
+#CFLAGS += -Wall -Werror
+
 CFLAGS += -D_LINUX -Dstricmp=strcasecmp -D_stricmp=strcasecmp -D_strnicmp=strncasecmp -Dstrnicmp=strncasecmp \
-	-D_snprintf=snprintf -D_vsnprintf=vsnprintf -D_alloca=alloca -Dstrcmpi=strcasecmp -Wall -Werror -Wno-switch \
+	-D_snprintf=snprintf -D_vsnprintf=vsnprintf -D_alloca=alloca -Dstrcmpi=strcasecmp -Wno-switch \
 	-Wno-unused -mfpmath=sse -msse -DSOURCEMOD_BUILD -DHAVE_STDINT_H -m32
 
 CPPFLAGS += -Wno-non-virtual-dtor -fno-exceptions -fno-rtti -fno-threadsafe-statics
