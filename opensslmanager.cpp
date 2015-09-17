@@ -2,14 +2,13 @@
 #include <openssl/crypto.h>
 #include <openssl/md5.h>
 #include <openssl/md4.h>
-#include <openssl/md2.h>
 #include <openssl/sha.h>
 #include <openssl/ripemd.h>
+#include <openssl/hmac.h>
 
 
 #define	MD5_FILE_BUFFER_SIZE		1024*16
 #define	MD4_FILE_BUFFER_SIZE		1024*16
-#define	MD2_FILE_BUFFER_SIZE		1024*16
 #define SHA_FILE_BUFFER_SIZE		1024*16
 #define SHA1_FILE_BUFFER_SIZE		1024*16
 #define SHA224_FILE_BUFFER_SIZE		1024*16
@@ -61,26 +60,6 @@ static void MD4_File(FILE *file, unsigned char **output, int *outlength)
 		MD4_Update(&c,buf,(unsigned long)i);
 	}
 	MD4_Final(*output, &c);
-}
-
-static void MD2_File(FILE *file, unsigned char **output, int *outlength)
-{
-	*output = new unsigned char[MD2_DIGEST_LENGTH];
-	*outlength = MD2_DIGEST_LENGTH;
-
-	MD2_CTX c;
-	int i;
-	unsigned char buf[MD2_FILE_BUFFER_SIZE];
-	
-	MD2_Init(&c);
-	for (;;)
-	{
-		i = fread(buf,1,MD2_FILE_BUFFER_SIZE,file);
-		if(i <= 0)
-			break;
-		MD2_Update(&c,buf,(unsigned long)i);
-	}
-	MD2_Final(*output, &c);
 }
 
 static void SHA_File(FILE *file, unsigned char **output, int *outlength)
@@ -281,9 +260,6 @@ bool OpensslManager::HashFile(Openssl_Hash algorithm, FILE *pFile, unsigned char
 		case Openssl_Hash_MD4:
 			MD4_File(pFile, output, outlength);
 			return true;
-		case Openssl_Hash_MD2:
-			MD2_File(pFile, output, outlength);
-			return true;
 		case Openssl_Hash_SHA:
 			SHA_File(pFile, output, outlength);
 			return true;
@@ -323,10 +299,6 @@ bool OpensslManager::HashString(Openssl_Hash algorithm, unsigned char *input, in
 			MD4(input, size, output);
 			*outlength = MD4_DIGEST_LENGTH;
 			return true;
-		case Openssl_Hash_MD2:
-			MD2(input, size, output);
-			*outlength = MD2_DIGEST_LENGTH;
-			return true;
 		case Openssl_Hash_SHA:
 			SHA(input, size, output);
 			*outlength = SHA_DIGEST_LENGTH;
@@ -360,3 +332,37 @@ bool OpensslManager::HashString(Openssl_Hash algorithm, unsigned char *input, in
 	return false;
 }
 
+bool OpensslManager::HMACString(Openssl_Hash algorithm, char *key, int key_len, unsigned char *input, int input_len, unsigned char *output, unsigned int *outlength)
+{
+	switch(algorithm)
+	{
+		case Openssl_Hash_MD5:
+			HMAC(EVP_md5(), key, key_len, input, input_len, output, outlength);
+			return true;
+		case Openssl_Hash_MD4:
+			HMAC(EVP_md4(), key, key_len, input, input_len, output, outlength);
+			return true;
+		case Openssl_Hash_SHA:
+			HMAC(EVP_sha(), key, key_len, input, input_len, output, outlength);
+			return true;
+		case Openssl_Hash_SHA1:
+			HMAC(EVP_sha1(), key, key_len, input, input_len, output, outlength);
+			return true;
+		case Openssl_Hash_SHA224:
+			HMAC(EVP_sha224(), key, key_len, input, input_len, output, outlength);
+			return true;
+		case Openssl_Hash_SHA256:
+			HMAC(EVP_sha256(), key, key_len, input, input_len, output, outlength);
+			return true;
+		case Openssl_Hash_SHA384:
+			HMAC(EVP_sha384(), key, key_len, input, input_len, output, outlength);
+			return true;
+		case Openssl_Hash_SHA512:
+			HMAC(EVP_sha512(), key, key_len, input, input_len, output, outlength);
+			return true;
+		case Openssl_Hash_RIPEMD160:
+			HMAC(EVP_ripemd160(), key, key_len, input, input_len, output, outlength);
+			return true;
+	}
+	return false;
+}

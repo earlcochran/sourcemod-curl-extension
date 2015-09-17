@@ -551,6 +551,35 @@ static cell_t sm_curl_hash_string(IPluginContext *pContext, const cell_t *params
 	return 1;
 }
 
+static cell_t sm_curl_hmac_string(IPluginContext *pContext, const cell_t *params)
+{
+	char *key;
+	char *input;
+	pContext->LocalToString(params[1], &key);
+	pContext->LocalToString(params[3], &input);
+
+	int key_len = params[2];
+	int input_len = params[4];
+
+	unsigned char output[128];
+	unsigned int outlength;
+	
+	bool ret = g_OpensslManager.HMACString((Openssl_Hash)params[5], key, key_len, (unsigned char*)input, input_len, &output[0], &outlength);
+	
+	if(!ret || outlength == 0)
+		return 0;
+
+	char buffer[256];
+	for (int i = 0; i < outlength; i++)
+	{
+		sprintf(&buffer[i*2], "%02x", output[i]);
+	}
+
+	size_t bytes;
+	pContext->StringToLocalUTF8(params[6], params[7], buffer, &bytes);
+	return 1;
+}
+
 sp_nativeinfo_t g_cURLNatives[] = 
 { 
 	{"curl_easy_init",				sm_curl_easy_init},
@@ -591,6 +620,7 @@ sp_nativeinfo_t g_cURLNatives[] =
 
 	{"curl_hash_file",				sm_curl_hash_file},
 	{"curl_hash_string",			sm_curl_hash_string},
+	{"curl_hmac_string",			sm_curl_hmac_string},
 
 	{NULL,							NULL}
 };

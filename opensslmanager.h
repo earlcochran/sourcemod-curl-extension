@@ -13,6 +13,7 @@ public:
 public:
 	bool HashFile(Openssl_Hash algorithm, FILE *pFile, unsigned char **output, int *outlength);
 	bool HashString(Openssl_Hash algorithm, unsigned char *input, int size, unsigned char *output, int *outlength);
+	bool HMACString(Openssl_Hash algorithm, char *key, int key_len, unsigned char *input, int input_len, unsigned char *output, unsigned int *outlength);
 
 };
 
