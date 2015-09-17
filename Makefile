@@ -3,7 +3,7 @@
 
 SMSDK = ../sourcemod
 SRCDS_BASE = ~/srcds
-MMSOURCE17 = ../metamod-source
+MMSOURCE17 = ../metamod
 SOURCEPAWN = $(SMSDK)/sourcepawn/include
 
 #####################################
@@ -37,19 +37,18 @@ CPP = g++ -std=c++11
 
 METAMOD = $(MMSOURCE17)/core-legacy
 
-INCLUDE += -I. -I./sdk \
+INCLUDE += -I. -I.. -Isdk -I../ \
 	-I$(METAMOD)/sourcehook -I$(SMSDK)/public -I$(SMSDK)/public/extensions \
-	-I$(SOURCEPAWN)
+	-I$(SOURCEPAWN) \
+	-I/usr/include/openssl \
 
 CFLAGS += -DSE_EPISODEONE=1 -DSE_DARKMESSIAH=2 -DSE_ORANGEBOX=3 -DSE_ORANGEBOXVALVE=4 -DSE_LEFT4DEAD=5 -DSE_LEFT4DEAD2=6
 
 CFLAGS += -DCURL_STATIC_LIB
 
-LINK += -lcurl -lrt -lssh2 -lssl -lcrypto -lz
+LINK += -L./lib -lcurl -lrt -lssh2 -lssl -lcrypto -lz
 
 LINK += -m32 -ldl -lm
-
-#CFLAGS += -Wall -Werror
 
 CFLAGS += -D_LINUX -Dstricmp=strcasecmp -D_stricmp=strcasecmp -D_strnicmp=strncasecmp -Dstrnicmp=strncasecmp \
 	-D_snprintf=snprintf -D_vsnprintf=vsnprintf -D_alloca=alloca -Dstrcmpi=strcasecmp -Wno-switch \
